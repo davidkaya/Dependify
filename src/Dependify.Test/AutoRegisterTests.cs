@@ -1,5 +1,10 @@
+// Copyright 2017 Dávid Kaya. All rights reserved.
+// Use of this source code is governed by the MIT license,
+// as found in the LICENSE file.
+
 using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using ShouldRegisterOneScoped;
@@ -9,9 +14,9 @@ using ShouldRegisterScoped;
 using ShouldRegisterSingleton;
 using ShouldRegisterTransient;
 
-namespace Dependify.Test {    
+namespace Dependify.Test {
     [TestFixture]
-    public class RegisterAttributeTests {                        
+    public class RegisterAttributeTests {
         [TestCase(nameof(ShouldRegisterTransient), typeof(ImplementationTransient), typeof(IInterface), ServiceLifetime.Transient)]
         [TestCase(nameof(ShouldRegisterSingleton), typeof(ImplementationSingleton), typeof(IInterface), ServiceLifetime.Singleton)]
         [TestCase(nameof(ShouldRegisterScoped), typeof(ImplementationScoped), typeof(IInterface), ServiceLifetime.Scoped)]
@@ -20,15 +25,14 @@ namespace Dependify.Test {
         [TestCase(nameof(ShouldRegisterOneScoped), typeof(ImplementationScopedOneInterface), typeof(IInterface2), ServiceLifetime.Scoped)]
         public void RegisterAttribute_RegistersClass_WhenDefined(string @namespace, Type classType, Type interfaceType, ServiceLifetime serviceLifetime) {
             IServiceCollection services = new ServiceCollection();
-            services.AutoRegister(@namespace);
+            services.AutoRegister(@namespace);            
             var service = services.First();
             Assert.AreEqual(1, services.Count);
-            Assert.AreEqual(interfaceType, service.ServiceType);            
+            Assert.AreEqual(interfaceType, service.ServiceType);
             Assert.AreEqual(classType, service.ImplementationType);
             Assert.AreEqual(serviceLifetime, service.Lifetime);
         }
-            
-        
+
         [TestCase(nameof(ShouldRegisterFactoryTransient), typeof(ImplementationTransient), typeof(IInterface), ServiceLifetime.Transient)]
         [TestCase(nameof(ShouldRegisterFactorySingleton), typeof(ImplementationSingleton), typeof(IInterface), ServiceLifetime.Singleton)]
         [TestCase(nameof(ShouldRegisterFactoryScoped), typeof(ImplementationScoped), typeof(IInterface), ServiceLifetime.Scoped)]
@@ -41,5 +45,5 @@ namespace Dependify.Test {
             Assert.NotNull(service.ImplementationFactory);
             Assert.AreEqual(serviceLifetime, service.Lifetime);
         }
-    }   
+    }
 }

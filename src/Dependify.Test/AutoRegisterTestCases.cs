@@ -1,13 +1,16 @@
-﻿using System;
-using Dependify;
+﻿// Copyright 2017 Dávid Kaya. All rights reserved.
+// Use of this source code is governed by the MIT license,
+// as found in the LICENSE file.
+
+using System;
 using Dependify.Attributes;
 using ShouldRegisterScoped;
 using ShouldRegisterSingleton;
 using ShouldRegisterTransient;
 
 public interface IInterface { }
-    
-public interface IInterface2 { }  
+
+public interface IInterface2 { }
 
 namespace ShouldRegisterTransient {
     [RegisterTransient]

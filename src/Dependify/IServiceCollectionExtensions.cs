@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright 2017 Dávid Kaya. All rights reserved.
+// Use of this source code is governed by the MIT license,
+// as found in the LICENSE file.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +13,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dependify {
     // ReSharper disable once InconsistentNaming
     public static class IServiceCollectionExtensions {
+        /// <summary>
+        /// Adds all classes with <see cref="RegisterScoped"/>, <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute to <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <returns>Service collection.</returns>
         public static IServiceCollection AutoRegister(this IServiceCollection services) {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             services.AddFactories(DependifyUtils.GetFactoryMethods(assemblies));
@@ -16,12 +25,24 @@ namespace Dependify {
             return services;
         }
 
+        /// <summary>
+        /// Adds all classes from specified <paramref name="assemblies"/> with <see cref="RegisterScoped"/>, <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute to <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <param name="assemblies">Assemblies to scan</param>
+        /// <returns>Service collection.</returns>
         public static IServiceCollection AutoRegister(this IServiceCollection services, params Assembly[] assemblies) {
             services.AddFactories(DependifyUtils.GetFactoryMethods(assemblies));
             services.AddClasses(DependifyUtils.GetClassTypes(assemblies));
             return services;
         }
         
+        /// <summary>
+        /// Adds all classes, from namespaces that start with <paramref name="namespace"/>, with <see cref="RegisterScoped"/>, <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute to <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="namespace"></param>
+        /// <returns></returns>
         public static IServiceCollection AutoRegister(this IServiceCollection services, string @namespace) {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             services.AddFactories(DependifyUtils.GetFactoryMethodsFromNamespace(assemblies, @namespace));
@@ -51,7 +72,7 @@ namespace Dependify {
                 foreach (var classAttribute in classAttributes) {
                     var registrationType = classAttribute.GetType();
                     var interfaceTypes = classAttribute.InterfaceTypes == null || !classAttribute.InterfaceTypes.Any() ? classType.GetInterfaces() : classAttribute.InterfaceTypes;
-                    
+
                     foreach (var interfaceType in interfaceTypes) {
                         if (registrationType == typeof(RegisterTransient))
                             services.AddTransient(interfaceType, classType);

@@ -9,6 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependify", "src\Dependify\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependify.Test", "src\Dependify.Test\Dependify.Test.csproj", "{BD19041B-FC13-456A-9F3E-7823B9EF5E70}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A674CE8-0416-4D59-A9F9-CB5987FC21C8}"
+	ProjectSection(SolutionItems) = preProject
+		Dependify.sln.DotSettings = Dependify.sln.DotSettings
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
