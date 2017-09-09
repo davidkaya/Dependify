@@ -6,6 +6,10 @@ Library that allows the developer to register his services by adding attributes 
 
 Why the name? Because I wanted to contribute to the following [list](http://www.thenameinspector.com/wp-content/uploads/ify-names-chart-20141.pdf).
 
+# Installation
+
+`dotnet add package Dependify --version 1.0.0-beta` or search using NuGet Package Manager.
+
 # Requirements
 
 * `.netstandard 2.0`
