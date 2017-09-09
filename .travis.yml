@@ -1,0 +1,6 @@
+language: csharp
+dotnet: 2.0.0
+
+script:
+  - dotnet build -c Release src/Dependify
+  - dotnet test src/Dependify.Test
