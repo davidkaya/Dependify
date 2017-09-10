@@ -61,10 +61,10 @@ public class Audi : ICar, IFuelConsumer {
 
 ## Factory method attributes
 
-If you want to add `Audi` as an implementation of `ICar` using factory method, you can do following
+If you want to add `Audi` as an implementation of `ICar` using static factory method, you can do following
 ```c#
 [RegisterTransientFactory(typeof(ICar))]
-public Audi CreateAudi(IServiceProvider provider) {
+public static Audi CreateAudi(IServiceProvider provider) {
     return new Audi();
 }
 ```
