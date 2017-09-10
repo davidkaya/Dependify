@@ -1,8 +1,6 @@
 # Dependify
 
-[![Build Status](https://travis-ci.org/davidkaya/Dependify.svg?branch=master)](https://travis-ci.org/davidkaya/Dependify)
-
-Version: _1.0.0-beta_
+[![Build Status](https://travis-ci.org/davidkaya/Dependify.svg?branch=master)](https://travis-ci.org/davidkaya/Dependify) [![Version](http://img.shields.io/nuget/vpre/Dependify.svg)](http://nuget.org/packages/Dependify)
 
 Library that allows the developer to register his services by adding attributes to class or factory methods. Library works only with Microsoft's `Microsoft.Extensions.DependencyInjection` package.
 
