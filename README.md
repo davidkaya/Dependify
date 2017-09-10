@@ -13,7 +13,7 @@ Why the name? Because I wanted to contribute to the following [list](http://www.
 # Requirements
 
 * `.netstandard 2.0`
-* `Microsoft.Extensions.DependencyInjection`
+* Currently works only with `IServiceCollection` from `Microsoft.Extensions.DependencyInjection`
 
 # Usage
 
