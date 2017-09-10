@@ -8,7 +8,7 @@ Why the name? Because I wanted to contribute to the following [list](http://www.
 
 # Installation
 
-`dotnet add package Dependify --version 1.0.0-beta` or search using NuGet Package Manager.
+`dotnet add package Dependify --version 1.0.0-*` or search using NuGet Package Manager.
 
 # Requirements
 
