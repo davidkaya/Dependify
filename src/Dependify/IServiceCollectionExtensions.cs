@@ -91,7 +91,13 @@ namespace Dependify {
                 var classAttributes = classType.GetCustomAttributes<Register>(true);
                 foreach (var classAttribute in classAttributes) {
                     var registrationType = classAttribute.GetType();
-                    var interfaceTypes = classAttribute.InterfaceTypes == null || !classAttribute.InterfaceTypes.Any() ? classType.GetInterfaces() : classAttribute.InterfaceTypes;
+                    IEnumerable<Type> interfaceTypes;
+                    if (classAttribute.InterfaceTypes?.Any() ?? false)
+                        interfaceTypes = classAttribute.InterfaceTypes;
+                    else if (classType.GetInterfaces().Any())
+                        interfaceTypes = classType.GetInterfaces();
+                    else
+                        interfaceTypes = new[] { classType };
 
                     foreach (var interfaceType in interfaceTypes) {
                         if (registrationType == typeof(RegisterTransient))

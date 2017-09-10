@@ -27,6 +27,21 @@ namespace ShouldRegisterSingleton {
     public class ImplementationSingleton : IInterface { }
 }
 
+namespace ShouldRegisterTransientWithoutInterface {
+    [RegisterTransient]
+    public class ImplementationTransientWithoutInterface { }
+}
+
+namespace ShouldRegisterScopedWithoutInterface {
+    [RegisterScoped]
+    public class ImplementationScopedWithoutInterface { }
+}
+
+namespace ShouldRegisterSingletonWithoutInterface {
+    [RegisterSingleton]
+    public class ImplementationSingletonWithoutInterface { }
+}
+
 namespace ShouldRegisterOneTransient {
     [RegisterTransient(typeof(IInterface2))]
     public class ImplementationTransientOneInterface : IInterface, IInterface2 { }

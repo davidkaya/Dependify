@@ -18,7 +18,7 @@ namespace Dependify.Utilities {
         }
 
         internal static IEnumerable<MethodInfo> GetFactoryMethodsFromNamespace(IEnumerable<Assembly> assemblies, string @namespace) {
-            return assemblies                    
+            return assemblies
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(type => type.IsClass && (type.Namespace?.StartsWith(@namespace)).GetValueOrDefault())
                 .SelectMany(MethodsWithAttribute);
@@ -45,7 +45,11 @@ namespace Dependify.Utilities {
         }
 
         internal static IEnumerable<Type> GetClassTypesFromNamespace(IEnumerable<Assembly> assemblies, string @namespace) {
-            return assemblies.SelectMany(assembly => assembly.GetTypes()).Where(type => type.IsClass && (type.Namespace?.StartsWith(@namespace)).GetValueOrDefault());
+            return assemblies.SelectMany(assembly => assembly.GetTypes()).Where(type => type.IsClass && BelongsToNamespace(type.Namespace, @namespace));
         }
+
+        private static bool BelongsToNamespace(string testedNamespace, string parentNamespace)
+            => testedNamespace != null &&
+                (testedNamespace == parentNamespace || testedNamespace.StartsWith(parentNamespace + "."));
     }
 }
