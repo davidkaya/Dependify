@@ -14,19 +14,23 @@ namespace Dependify {
     // ReSharper disable once InconsistentNaming
     public static class IServiceCollectionExtensions {
         /// <summary>
-        /// Adds all classes with <see cref="RegisterScoped"/>, <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute to <see cref="IServiceCollection"/>.
+        /// Adds all classes and factory methods with <see cref="RegisterScoped"/>, 
+        /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">Service collection.</param>
         /// <returns>Service collection.</returns>
         public static IServiceCollection AutoRegister(this IServiceCollection services) {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            services.AddFactories(DependifyUtils.GetFactoryMethods(assemblies));
-            services.AddClasses(DependifyUtils.GetClassTypes(assemblies));
-            return services;
+            return services.AutoRegister(assemblies);
         }
 
         /// <summary>
-        /// Adds all classes from specified <paramref name="assemblies"/> with <see cref="RegisterScoped"/>, <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute to <see cref="IServiceCollection"/>.
+        /// Adds all classes and factory methods from specified <paramref name="assemblies"/> with <see cref="RegisterScoped"/>, 
+        /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">Service collection.</param>
         /// <param name="assemblies">Assemblies to scan</param>
@@ -36,18 +40,34 @@ namespace Dependify {
             services.AddClasses(DependifyUtils.GetClassTypes(assemblies));
             return services;
         }
-        
+
         /// <summary>
-        /// Adds all classes, from namespaces that start with <paramref name="namespace"/>, with <see cref="RegisterScoped"/>, <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute to <see cref="IServiceCollection"/>.
+        /// Adds all classes and factory methods, from namespaces that start with <paramref name="namespace"/>, with <see cref="RegisterScoped"/>, 
+        /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="namespace"></param>
+        /// <param name="services">Service collection.</param>
+        /// <param name="namespace">Scanned namespace.</param>
         /// <returns></returns>
         public static IServiceCollection AutoRegister(this IServiceCollection services, string @namespace) {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             services.AddFactories(DependifyUtils.GetFactoryMethodsFromNamespace(assemblies, @namespace));
             services.AddClasses(DependifyUtils.GetClassTypesFromNamespace(assemblies, @namespace));
             return services;
+        }
+
+        /// <summary>
+        /// Adds all classes and factory methods resolved from <paramref name="assemblyResolver"/> with <see cref="RegisterScoped"/>, 
+        /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// factory methods to <see cref="IServiceCollection"/>. 
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        /// <param name="assemblyResolver">Assembly resolver.</param>
+        /// <returns></returns>
+        public static IServiceCollection AutoRegister(this IServiceCollection services, IAssemblyResolver assemblyResolver) {
+            return services.AutoRegister(assemblyResolver.Resolve().ToArray());
         }
 
         internal static IServiceCollection AddFactories(this IServiceCollection services, IEnumerable<MethodInfo> methodInfos) {
