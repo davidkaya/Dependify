@@ -49,7 +49,6 @@ namespace Dependify.Utilities {
         }
 
         private static bool BelongsToNamespace(string testedNamespace, string parentNamespace)
-            => testedNamespace != null &&
-                (testedNamespace == parentNamespace || testedNamespace.StartsWith(parentNamespace + "."));
+            => testedNamespace == parentNamespace || (testedNamespace?.StartsWith(parentNamespace + ".") ?? false);
     }
 }
