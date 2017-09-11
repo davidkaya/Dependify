@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Dependify</PackageId>
-    <PackageVersion>1.0.0-beta2</PackageVersion>
+    <PackageVersion>1.0.0-beta3</PackageVersion>
     <Authors>Dávid Kaya</Authors>
     <Description>Package that allows to register services to IServiceCollection by using attributes on classes and factory methods.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

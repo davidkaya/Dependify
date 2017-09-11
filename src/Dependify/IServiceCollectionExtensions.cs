@@ -71,7 +71,7 @@ namespace Dependify {
             return services.AutoRegister(assemblyResolver.Resolve().ToArray());
         }
 
-        internal static IServiceCollection AddFactories(this IServiceCollection services, IEnumerable<MethodInfo> methodInfos) {
+        private static IServiceCollection AddFactories(this IServiceCollection services, IEnumerable<MethodInfo> methodInfos) {
             foreach (var methodInfo in methodInfos) {
                 var factoryAttribute = methodInfo.GetCustomAttributes<RegisterFactory>(true).First();
                 var factoryReturnType = factoryAttribute.ReturnType;
@@ -94,7 +94,7 @@ namespace Dependify {
             }
         }
 
-        internal static IServiceCollection AddClasses(this IServiceCollection services, IEnumerable<Type> classTypes) {
+        private static IServiceCollection AddClasses(this IServiceCollection services, IEnumerable<Type> classTypes) {
             foreach (var classType in classTypes) {
                 var classAttributes = classType.GetCustomAttributes<Register>(true);
                 foreach (var classAttribute in classAttributes) {
@@ -110,7 +110,7 @@ namespace Dependify {
             return services;
         }
 
-        internal static IServiceCollection AddInterfaceImplementations(this IServiceCollection services, ServiceLifetime serviceLifetime, IEnumerable<Type> interfaceTypes, Type classType) {
+        private static IServiceCollection AddInterfaceImplementations(this IServiceCollection services, ServiceLifetime serviceLifetime, IEnumerable<Type> interfaceTypes, Type classType) {
             switch (serviceLifetime) {
                 case ServiceLifetime.Singleton :
                     interfaceTypes.ForEach(interfaceType => services.AddSingleton(interfaceType, classType));
@@ -126,7 +126,7 @@ namespace Dependify {
             }
         }
 
-        internal static IServiceCollection AddClassImplementation(this IServiceCollection services, ServiceLifetime serviceLifetime, Type classType) {
+        private static IServiceCollection AddClassImplementation(this IServiceCollection services, ServiceLifetime serviceLifetime, Type classType) {
             switch (serviceLifetime) {
                 case ServiceLifetime.Singleton :
                     return services.AddSingleton(classType);
