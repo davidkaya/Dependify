@@ -122,7 +122,7 @@ namespace Dependify {
                     interfaceTypes.ForEach(interfaceType => services.AddTransient(interfaceType, classType));
                     return services;
                 default :
-                    throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
+                    throw new ArgumentOutOfRangeException($"{serviceLifetime} is not supported.");
             }
         }
 
@@ -135,7 +135,7 @@ namespace Dependify {
                 case ServiceLifetime.Transient :
                     return services.AddTransient(classType);
                 default :
-                    throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
+                    throw new ArgumentOutOfRangeException($"{serviceLifetime} is not supported.");
             }
         }
     }
