@@ -4,7 +4,6 @@
 
 using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using ShouldRegisterOneScoped;
@@ -31,7 +30,7 @@ namespace Dependify.Test {
         [TestCase(nameof(ShouldRegisterOneScoped), typeof(ImplementationScopedOneInterface), typeof(IInterface2), ServiceLifetime.Scoped)]
         public void RegisterAttribute_RegistersClass_WhenDefined(string @namespace, Type classType, Type interfaceType, ServiceLifetime serviceLifetime) {
             IServiceCollection services = new ServiceCollection();
-            services.AutoRegister(@namespace);            
+            services.AutoRegister(@namespace);
             var service = services.First();
             Assert.AreEqual(1, services.Count);
             Assert.AreEqual(interfaceType, service.ServiceType);

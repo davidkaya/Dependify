@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Dependify.Attributes;
+using Dependify.Extensions;
 using Dependify.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,9 +15,9 @@ namespace Dependify {
     // ReSharper disable once InconsistentNaming
     public static class IServiceCollectionExtensions {
         /// <summary>
-        /// Adds all classes and factory methods with <see cref="RegisterScoped"/>, 
+        /// Adds all classes and factory methods with <see cref="RegisterScoped"/>,
         /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
-        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for
         /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">Service collection.</param>
@@ -27,9 +28,9 @@ namespace Dependify {
         }
 
         /// <summary>
-        /// Adds all classes and factory methods from specified <paramref name="assemblies"/> with <see cref="RegisterScoped"/>, 
+        /// Adds all classes and factory methods from specified <paramref name="assemblies"/> with <see cref="RegisterScoped"/>,
         /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
-        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for
         /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">Service collection.</param>
@@ -42,9 +43,9 @@ namespace Dependify {
         }
 
         /// <summary>
-        /// Adds all classes and factory methods, from namespaces that start with <paramref name="namespace"/>, with <see cref="RegisterScoped"/>, 
+        /// Adds all classes and factory methods, from namespaces that start with <paramref name="namespace"/>, with <see cref="RegisterScoped"/>,
         /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
-        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for
         /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">Service collection.</param>
@@ -58,10 +59,10 @@ namespace Dependify {
         }
 
         /// <summary>
-        /// Adds all classes and factory methods resolved from <paramref name="assemblyResolver"/> with <see cref="RegisterScoped"/>, 
+        /// Adds all classes and factory methods resolved from <paramref name="assemblyResolver"/> with <see cref="RegisterScoped"/>,
         /// <see cref="RegisterSingleton"/> or <see cref="RegisterTransient"/> attribute for classes
-        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for 
-        /// factory methods to <see cref="IServiceCollection"/>. 
+        /// and <see cref="RegisterScopedFactory"/>, <see cref="RegisterSingletonFactory"/> or <see cref="RegisterTransientFactory"/> for
+        /// factory methods to <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">Service collection.</param>
         /// <param name="assemblyResolver">Assembly resolver.</param>
@@ -73,41 +74,68 @@ namespace Dependify {
         internal static IServiceCollection AddFactories(this IServiceCollection services, IEnumerable<MethodInfo> methodInfos) {
             foreach (var methodInfo in methodInfos) {
                 var factoryAttribute = methodInfo.GetCustomAttributes<RegisterFactory>(true).First();
-                var factoryAttributeType = factoryAttribute.GetType();
                 var factoryReturnType = factoryAttribute.ReturnType;
-
-                if (factoryAttributeType == typeof(RegisterTransientFactory))
-                    services.AddTransient(factoryReturnType, DependifyUtils.GetFactoryMethod(methodInfo));
-                if (factoryAttributeType == typeof(RegisterScopedFactory))
-                    services.AddScoped(factoryReturnType, DependifyUtils.GetFactoryMethod(methodInfo));
-                if (factoryAttributeType == typeof(RegisterSingletonFactory))
-                    services.AddSingleton(factoryReturnType, DependifyUtils.GetFactoryMethod(methodInfo));
+                var factoryLifetime = factoryAttribute.MapToLifetime();
+                services.AddFactoryMethods(factoryLifetime, factoryReturnType, methodInfo);
             }
             return services;
         }
 
-        internal static void AddClasses(this IServiceCollection services, IEnumerable<Type> classTypes) {
+        private static IServiceCollection AddFactoryMethods(this IServiceCollection services, ServiceLifetime factoryLifetime, Type factoryReturnType, MethodInfo methodInfo) {
+            switch (factoryLifetime) {
+                case ServiceLifetime.Singleton :
+                    return services.AddSingleton(factoryReturnType, DependifyUtils.GetFactoryMethod(methodInfo));
+                case ServiceLifetime.Scoped :
+                    return services.AddScoped(factoryReturnType, DependifyUtils.GetFactoryMethod(methodInfo));
+                case ServiceLifetime.Transient :
+                    return services.AddTransient(factoryReturnType, DependifyUtils.GetFactoryMethod(methodInfo));
+                default :
+                    throw new ArgumentOutOfRangeException($"{factoryLifetime} is not supported.");
+            }
+        }
+
+        internal static IServiceCollection AddClasses(this IServiceCollection services, IEnumerable<Type> classTypes) {
             foreach (var classType in classTypes) {
                 var classAttributes = classType.GetCustomAttributes<Register>(true);
                 foreach (var classAttribute in classAttributes) {
-                    var registrationType = classAttribute.GetType();
-                    IEnumerable<Type> interfaceTypes;
+                    var classLifetime = classAttribute.MapToLifetime();
                     if (classAttribute.InterfaceTypes?.Any() ?? false)
-                        interfaceTypes = classAttribute.InterfaceTypes;
+                        services.AddInterfaceImplementations(classLifetime, classAttribute.InterfaceTypes, classType);
                     else if (classType.GetInterfaces().Any())
-                        interfaceTypes = classType.GetInterfaces();
+                        services.AddInterfaceImplementations(classLifetime, classType.GetInterfaces(), classType);
                     else
-                        interfaceTypes = new[] { classType };
-
-                    foreach (var interfaceType in interfaceTypes) {
-                        if (registrationType == typeof(RegisterTransient))
-                            services.AddTransient(interfaceType, classType);
-                        if (registrationType == typeof(RegisterScoped))
-                            services.AddScoped(interfaceType, classType);
-                        if (registrationType == typeof(RegisterSingleton))
-                            services.AddSingleton(interfaceType, classType);
-                    }
+                        services.AddClassImplementation(classLifetime, classType);
                 }
+            }
+            return services;
+        }
+
+        internal static IServiceCollection AddInterfaceImplementations(this IServiceCollection services, ServiceLifetime serviceLifetime, IEnumerable<Type> interfaceTypes, Type classType) {
+            switch (serviceLifetime) {
+                case ServiceLifetime.Singleton :
+                    interfaceTypes.ForEach(interfaceType => services.AddSingleton(interfaceType, classType));
+                    return services;
+                case ServiceLifetime.Scoped :
+                    interfaceTypes.ForEach(interfaceType => services.AddScoped(interfaceType, classType));
+                    return services;
+                case ServiceLifetime.Transient :
+                    interfaceTypes.ForEach(interfaceType => services.AddTransient(interfaceType, classType));
+                    return services;
+                default :
+                    throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
+            }
+        }
+
+        internal static IServiceCollection AddClassImplementation(this IServiceCollection services, ServiceLifetime serviceLifetime, Type classType) {
+            switch (serviceLifetime) {
+                case ServiceLifetime.Singleton :
+                    return services.AddSingleton(classType);
+                case ServiceLifetime.Scoped :
+                    return services.AddScoped(classType);
+                case ServiceLifetime.Transient :
+                    return services.AddTransient(classType);
+                default :
+                    throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
             }
         }
     }

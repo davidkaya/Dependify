@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Dependify.Attributes {
     [AttributeUsage(AttributeTargets.Class)]
-    public abstract class Register : Attribute {
+    public abstract class Register : DependifyAttribute {
         public IEnumerable<Type> InterfaceTypes { get; }
 
         protected Register() { }
