@@ -11,8 +11,11 @@ using ShouldRegisterOneScoped;
 using ShouldRegisterOneSingleton;
 using ShouldRegisterOneTransient;
 using ShouldRegisterScoped;
+using ShouldRegisterScopedWithoutInterface;
 using ShouldRegisterSingleton;
+using ShouldRegisterSingletonWithoutInterface;
 using ShouldRegisterTransient;
+using ShouldRegisterTransientWithoutInterface;
 
 namespace Dependify.Test {
     [TestFixture]
@@ -20,6 +23,9 @@ namespace Dependify.Test {
         [TestCase(nameof(ShouldRegisterTransient), typeof(ImplementationTransient), typeof(IInterface), ServiceLifetime.Transient)]
         [TestCase(nameof(ShouldRegisterSingleton), typeof(ImplementationSingleton), typeof(IInterface), ServiceLifetime.Singleton)]
         [TestCase(nameof(ShouldRegisterScoped), typeof(ImplementationScoped), typeof(IInterface), ServiceLifetime.Scoped)]
+        [TestCase(nameof(ShouldRegisterTransientWithoutInterface), typeof(ImplementationTransientWithoutInterface), typeof(ImplementationTransientWithoutInterface), ServiceLifetime.Transient)]
+        [TestCase(nameof(ShouldRegisterSingletonWithoutInterface), typeof(ImplementationSingletonWithoutInterface), typeof(ImplementationSingletonWithoutInterface), ServiceLifetime.Singleton)]
+        [TestCase(nameof(ShouldRegisterScopedWithoutInterface), typeof(ImplementationScopedWithoutInterface), typeof(ImplementationScopedWithoutInterface), ServiceLifetime.Scoped)]
         [TestCase(nameof(ShouldRegisterOneTransient), typeof(ImplementationTransientOneInterface), typeof(IInterface2), ServiceLifetime.Transient)]
         [TestCase(nameof(ShouldRegisterOneSingleton), typeof(ImplementationSingletonOneInterface), typeof(IInterface2), ServiceLifetime.Singleton)]
         [TestCase(nameof(ShouldRegisterOneScoped), typeof(ImplementationScopedOneInterface), typeof(IInterface2), ServiceLifetime.Scoped)]
